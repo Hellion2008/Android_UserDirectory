@@ -38,6 +38,8 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        setSupportActionBar(findViewById(R.id.toolbarMain))
+
         nameEditTextET = findViewById(R.id.nameEditTextET)
         ageEditTextET = findViewById(R.id.ageEditTextET)
 
