@@ -3,6 +3,7 @@ package ru.urban.android_userdirectory
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.AdapterView
@@ -16,7 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), Removable {
 
     private lateinit var nameEditTextET: EditText
     private lateinit var ageEditTextET: EditText
@@ -26,6 +27,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var listViewLV: ListView
 
     private val list: MutableList<User> = mutableListOf()
+
+    private var adapter: ArrayAdapter<User>? = null
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,14 +50,18 @@ class MainActivity : AppCompatActivity() {
 
         listViewLV = findViewById(R.id.listViewLV)
 
-        val adapter =
+        adapter =
             ArrayAdapter(this, android.R.layout.simple_list_item_1,list)
         listViewLV.adapter = adapter
 
         listViewLV.onItemClickListener =
             AdapterView.OnItemClickListener{ parent, v, position, id ->
-                adapter.remove(adapter.getItem(position))
-                Toast.makeText(this, "Пользователь удален", Toast.LENGTH_SHORT).show()
+                val user = adapter!!.getItem(position)
+                val dialog = MyDialog()
+                val args = Bundle()
+                args.putParcelable("user", user)
+                dialog.arguments = args
+                dialog.show(supportFragmentManager, "custom")
             }
 
         saveBTN.setOnClickListener { view ->
@@ -62,7 +69,7 @@ class MainActivity : AppCompatActivity() {
             nameEditTextET.text.clear()
             ageEditTextET.text.clear()
 
-            adapter.notifyDataSetInvalidated()
+            adapter!!.notifyDataSetInvalidated()
         }
     }
 
@@ -84,5 +91,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun remove(user: User?) {
+        adapter?.remove(user)
     }
 }

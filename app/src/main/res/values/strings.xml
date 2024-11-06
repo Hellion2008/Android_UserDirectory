@@ -3,5 +3,5 @@
     <string name="name_edit_text">Введи имя</string>
     <string name="age_edit_text">Введи возраст</string>
     <string name="save_btn">Сохранить</string>
-    <string name="exit_menu">Exit</string>
+    <string name="exit_menu">Выход</string>
 </resources>
