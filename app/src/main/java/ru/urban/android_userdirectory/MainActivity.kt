@@ -12,6 +12,7 @@ import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.isDigitsOnly
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
@@ -25,7 +26,7 @@ class MainActivity : AppCompatActivity(), Removable {
 
     private lateinit var listViewLV: ListView
 
-    private val list: MutableList<User> = mutableListOf()
+    private lateinit var list: MutableList<User>
 
     private var adapter: ArrayAdapter<User>? = null
 
@@ -53,12 +54,6 @@ class MainActivity : AppCompatActivity(), Removable {
 
         userViewModel = ViewModelProvider(this)[UserViewModel::class.java]
 
-        userViewModel.current.value = list
-
-//        adapter =
-//            ArrayAdapter(this, android.R.layout.simple_list_item_1, list)
-//        listViewLV.adapter = adapter
-
         userViewModel.current.observe(this, {
             adapter =
                 ArrayAdapter(this, android.R.layout.simple_list_item_1, it)
@@ -77,9 +72,16 @@ class MainActivity : AppCompatActivity(), Removable {
             }
 
         saveBTN.setOnClickListener { view ->
-            val value = userViewModel.current.value ?: mutableListOf()
-            value.add(User(nameEditTextET.text.toString(), ageEditTextET.text.toString().toInt()))
-            userViewModel.current.value = value
+            if (nameEditTextET.text.isEmpty() || ageEditTextET.text.isEmpty()
+                || !ageEditTextET.text.isDigitsOnly()) {
+
+                Toast.makeText(this, "Неправильный формат текста", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            list = userViewModel.current.value ?: mutableListOf()
+            userViewModel.current.value = list
+            list.add(User(nameEditTextET.text.toString(), ageEditTextET.text.toString().toInt()))
             nameEditTextET.text.clear()
             ageEditTextET.text.clear()
 
