@@ -53,6 +53,8 @@ class MainActivity : AppCompatActivity(), Removable {
 
         userViewModel = ViewModelProvider(this)[UserViewModel::class.java]
 
+        userViewModel.current.value = list
+
 //        adapter =
 //            ArrayAdapter(this, android.R.layout.simple_list_item_1, list)
 //        listViewLV.adapter = adapter
@@ -75,7 +77,9 @@ class MainActivity : AppCompatActivity(), Removable {
             }
 
         saveBTN.setOnClickListener { view ->
-            userViewModel.current.value?.add(User(nameEditTextET.text.toString(), ageEditTextET.text.toString().toInt()))
+            val value = userViewModel.current.value ?: mutableListOf()
+            value.add(User(nameEditTextET.text.toString(), ageEditTextET.text.toString().toInt()))
+            userViewModel.current.value = value
             nameEditTextET.text.clear()
             ageEditTextET.text.clear()
 
