@@ -1,9 +1,7 @@
 package ru.urban.android_userdirectory
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.AdapterView
@@ -16,6 +14,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 
 class MainActivity : AppCompatActivity(), Removable {
 
@@ -29,6 +28,8 @@ class MainActivity : AppCompatActivity(), Removable {
     private val list: MutableList<User> = mutableListOf()
 
     private var adapter: ArrayAdapter<User>? = null
+
+    private lateinit var userViewModel: UserViewModel
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,9 +51,18 @@ class MainActivity : AppCompatActivity(), Removable {
 
         listViewLV = findViewById(R.id.listViewLV)
 
-        adapter =
-            ArrayAdapter(this, android.R.layout.simple_list_item_1,list)
-        listViewLV.adapter = adapter
+        userViewModel = ViewModelProvider(this)[UserViewModel::class.java]
+
+//        adapter =
+//            ArrayAdapter(this, android.R.layout.simple_list_item_1, list)
+//        listViewLV.adapter = adapter
+
+        userViewModel.current.observe(this, {
+            adapter =
+                ArrayAdapter(this, android.R.layout.simple_list_item_1, it)
+            listViewLV.adapter = adapter
+            adapter?.notifyDataSetChanged()
+        })
 
         listViewLV.onItemClickListener =
             AdapterView.OnItemClickListener{ parent, v, position, id ->
@@ -65,11 +75,11 @@ class MainActivity : AppCompatActivity(), Removable {
             }
 
         saveBTN.setOnClickListener { view ->
-            list.add(User(nameEditTextET.text.toString(), ageEditTextET.text.toString().toInt()))
+            userViewModel.current.value?.add(User(nameEditTextET.text.toString(), ageEditTextET.text.toString().toInt()))
             nameEditTextET.text.clear()
             ageEditTextET.text.clear()
 
-            adapter!!.notifyDataSetInvalidated()
+            adapter!!.notifyDataSetChanged()
         }
     }
 
@@ -95,5 +105,6 @@ class MainActivity : AppCompatActivity(), Removable {
 
     override fun remove(user: User?) {
         adapter?.remove(user)
+        adapter?.notifyDataSetChanged()
     }
 }
